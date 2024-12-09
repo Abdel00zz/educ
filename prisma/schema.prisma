@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Quiz {
+  id          String    @id @default(uuid())
+  title       String
+  gradeLevel  String
+  subject     String
+  lesson      String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  questions   Question[]
+}
+
+model Question {
+  id          String    @id @default(uuid())
+  type        String    // 'truefalse', 'mcq', 'fillblank'
+  text        String
+  answer      String    // JSON string for MCQ options
+  options     String?   // JSON string for MCQ options
+  quizId      String
+  quiz        Quiz      @relation(fields: [quizId], references: [id])
+}
+
+model Exercise {
+  id          String    @id @default(uuid())
+  gradeLevel  String
+  lesson      String
+  statement   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  problems    Problem[]
+}
+
+model Problem {
+  id          String    @id @default(uuid())
+  number      Int
+  text        String
+  exerciseId  String
+  exercise    Exercise  @relation(fields: [exerciseId], references: [id])
+  subProblems SubProblem[]
+}
+
+model SubProblem {
+  id          String    @id @default(uuid())
+  label       String
+  text        String
+  problemId   String
+  problem     Problem   @relation(fields: [problemId], references: [id])
+}
